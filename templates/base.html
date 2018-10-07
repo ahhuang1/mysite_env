@@ -15,6 +15,8 @@
  {% block css %}{% endblock %}
 </head>
 <body>
+{% block body %}
+{% endblock %}
 <nav class="navbar navbar-default">
   <div class="container-fluid">
     <!-- Brand and toggle get grouped for better mobile display -->
@@ -25,13 +27,13 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="#">Mysite</a>
+      <a class="navbar-brand" href="#">首页</a>
     </div>
 
     <!-- Collect the nav links, forms, and other content for toggling -->
     <div class="collapse navbar-collapse" id="my-nav">
       <ul class="nav navbar-nav">
-        <li class="active"><a href="/index/">主页</a></li>
+        <li class="active"><a href="/blogs/">微博首页</a></li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
           {% if request.session.is_login %}
@@ -41,6 +43,16 @@
         <li><a href="/login/">登录</a></li>
         <li><a href="/register/">注册</a></li>
           {% endif %}
+        {% if request.session.user_permission %}
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">下拉菜单 <span class="caret"></span></a>
+          <ul class="dropdown-menu">
+            <li><a href="/blogs/add/">新增微博</a></li>
+            <li role="separator" class="divider"></li>
+            <li><a href="/blogs/manage/">微博管理</a></li>
+          </ul>
+        </li>
+        {% endif %}
       </ul>
     </div><!-- /.navbar-collapse -->
   </div><!-- /.container-fluid -->

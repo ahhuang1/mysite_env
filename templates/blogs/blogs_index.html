@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% load tags %}
+{% block title %}主页{% endblock %}
+{% block content %}
+    {% if request.session.is_login %}
+    <h1>欢迎回来：{{ request.session.user_name }}</h1>
+    {% else %}
+    <h1>未登录的首页！</h1>
+    {% endif %}
+{% for o in contacts %}
+<div class="row">
+<ul class="media-list col-sm-6 col-md-offset-3">
+    <li class="media">
+        <div class="media-body"><a href="blogs_detail/{{ o.id }}/">
+          <h4 class="media-heading ">{{ o.name }}</h4>
+          {{ o.summary }}
+        </a>
+        </div>
+    </li>
+    <hr>
+</ul>
+</div>
+{% endfor %}
+    <div class="row">
+    <div class="col-sm-6 col-md-offset-3">
+    {% build_paginators contacts %}
+    </div>
+    </div>
+{% endblock %}

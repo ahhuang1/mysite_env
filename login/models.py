@@ -13,6 +13,7 @@ class User(models.Model):
     sex = models.CharField(max_length=32,choices=gender,default="男")
     c_time = models.DateTimeField(auto_now_add=True)
     has_confirmed = models.BooleanField(default=False)#是否邮箱确定的字段
+    admin = models.BooleanField(default=False)#是否是管理员用户
 
     def __str__(self):
         return self.name

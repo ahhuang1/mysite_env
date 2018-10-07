@@ -1,14 +1,14 @@
 import datetime
-from django.shortcuts import render
+from django.shortcuts import render,HttpResponseRedirect
 from django.shortcuts import redirect
 from login import models,forms
 from django.conf import settings
 
 # Create your views here.
 
-def index(request):
-    pass
-    return render(request,'login/index.html')
+# def blogs_index(request):
+#     pass
+#     return render(request,'blogs/blogs_index.html')
 
 import hashlib
 
@@ -19,12 +19,17 @@ def hash_code(s,salt='mysite'):
     return h.hexdigest()
 
 def login(request):
-    if request.session.get('is_login',None):
-        return redirect("/index/")
     from captcha.models import CaptchaStore
     from captcha.helpers import captcha_image_url
     hashkey = CaptchaStore.generate_key()
     imgage_url = captcha_image_url(hashkey)
+
+    if request.method == "GET":
+        # 记住来源的url，如果没有则设置为首页('/')
+        request.session['login_from'] = request.META.get('HTTP_REFERER', '/blogs/')
+        if request.session.get('is_login',None):
+            return redirect("/blogs/")
+
     if request.method == "POST":
         login_form = forms.UserForm(request.POST)
         # username = request.POST.get('username',None)
@@ -42,7 +47,8 @@ def login(request):
                     request.session['is_login'] = True
                     request.session['user_id'] = user.id
                     request.session['user_name'] = user.name
-                    return redirect("/index/")
+                    request.session['user_permission'] = user.admin
+                    return HttpResponseRedirect(request.session['login_from'])
                     #return render(request,'login/index.html')
                 else:
                     message = "密码不正确！"
@@ -56,7 +62,7 @@ def login(request):
 
 def register(request):
     if request.session.get('is_login',None):
-        return redirect("/index/")
+        return redirect("/blogs/")
     if request.method ==  "POST":
         register_form = forms.RegisterForm(request.POST)
         message = "请检查填写内容"
@@ -98,9 +104,9 @@ def register(request):
 
 def logout(request):
     if not request.session.get('is_login',None):
-        return redirect("/index/")
+        return redirect("/blogs/")
     request.session.flush()
-    return redirect('/index/')
+    return redirect('/blogs/')
 
 def user_confirm(request):
     code = request.GET.get('code',None)
@@ -115,7 +121,7 @@ def user_confirm(request):
     now = timezone.now()
     # now = datetime.datetime.now() 该时间获取没有时区
     if now > c_time + datetime.timedelta(settings.CONFIRM_DAYS):
-        message = '您的邮箱已经过去！请重新注册！'
+        message = '您的邮箱已经过期！请重新注册！'
         return render(request,'login/confirm.html',locals())
     else:
         confirm.user.has_confirmed = True
